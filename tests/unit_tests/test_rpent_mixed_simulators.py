@@ -153,3 +153,14 @@ def test_candidate_cleanup_routes_owners_to_their_backends(tmp_path):
         assert receipt["cleanup_complete"]
         assert receipt["status"] == record["status"]
     assert not worker._candidate_attempts
+
+
+def test_metaworld_and_libero_draw_whole_groups():
+    simulators = mixed_simulators(mixed_config(("metaworld", "libero")))
+    assert list(simulators) == ["metaworld", "libero"]
+    quotas = [s.sampling_groups for s in simulators.values()]
+    assert quotas == [20, 20]
+    sampler = SimulatorBatchSampler([21, 24], quotas, shuffle=False, seed=49)
+    (batch,) = sampler
+    assert batch[::2] == list(range(20))
+    assert batch[1::2] == list(range(21, 41))
