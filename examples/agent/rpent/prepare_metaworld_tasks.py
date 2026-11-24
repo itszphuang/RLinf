@@ -30,7 +30,7 @@ def write_pools(output_dir: Path, seeds: list[int]) -> None:
         for seed in seeds:
             env, identity = initial_scene(name, seed, benchmark)
             env.close()
-            task = {"environment": "metaworld", "task_name": name, "seed": seed}
+            task = {"environment": "metaworld", "task_name": name, "seed": seed, "init_state_id": seed}
             rows[name].append({
                 "query_id": f"metaworld-{name}-s{seed}",
                 "prompt": descriptions[name],
