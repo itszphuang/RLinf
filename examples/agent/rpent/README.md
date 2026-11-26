@@ -1,6 +1,6 @@
 # RPent Multi-Turn Embodied GRPO Training
 
-This example trains a 4B Vision-Language-Action reasoning model (Qwen3.5-4B) with synchronous multi-turn GRPO and oversampling across multiple manipulation simulators (LIBERO and RoboTwin, with extensible registry support for RoboCasa and RoboDojo) served by [RPent](https://github.com/RLinf/RPent).
+This example trains a 4B Vision-Language-Action reasoning model (Qwen3.5-4B) with synchronous multi-turn GRPO and oversampling across multiple manipulation simulators (LIBERO and RoboTwin, with extensible registry support for RoboCasa, RoboDojo and MetaWorld) served by [RPent](https://github.com/RLinf/RPent).
 
 ## Architecture
 
@@ -57,6 +57,12 @@ This example trains a 4B Vision-Language-Action reasoning model (Qwen3.5-4B) wit
 python examples/agent/rpent/prepare_tasks.py \
   --libero-out /path/to/data/libero/train.jsonl \
   --robotwin-out /path/to/data/robotwin/train.jsonl
+```
+
+In the MetaWorld Python 3.11 environment, with both repositories on `PYTHONPATH`, prepare the MT50, ML45 train and ML45 held-out pools for native index 49:
+
+```bash
+python examples/agent/rpent/prepare_tasks.py --metaworld --seeds 49 --output-dir data/metaworld
 ```
 
 ### 2. Start Simulator & SAM3 Services (GPUs 4–7)
