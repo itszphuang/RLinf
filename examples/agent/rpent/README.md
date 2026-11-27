@@ -65,6 +65,25 @@ In the MetaWorld Python 3.11 environment, with both repositories on `PYTHONPATH`
 python examples/agent/rpent/prepare_tasks.py --metaworld --seeds 49 --output-dir data/metaworld
 ```
 
+To mix MetaWorld into GRPO training, register `env.rpent.metaworld` alongside the other pools (episode quotas must be multiples of `algorithm.group_size` and sum to `data.rollout_batch_size * group_size` / `data.sampling_batch_size * group_size`):
+
+```yaml
+env:
+  rpent:
+    libero:
+      endpoint: http://127.0.0.1:28561
+      train_data_paths: ${oc.env:RPENT_ROOT,/path/to/rpent_ppo}/data/libero/train.jsonl
+      rollout_episodes: 8
+      sampling_episodes: 16
+    metaworld:
+      endpoint: http://127.0.0.1:28565
+      train_data_paths: ${oc.env:RPENT_ROOT,/path/to/rpent_ppo}/data/metaworld/ml45-train.jsonl
+      rollout_episodes: 8
+      sampling_episodes: 16
+```
+
+> **MetaWorld runtime notes**: RPent clamps `max_episode_steps` to MetaWorld's native **500-step horizon** regardless of larger requested values. MetaWorld's fixed-wrist Sawyer enforces a strict **4-DoF `move_to` schema (`xyz`-only)** — passing `orientation_rpy` triggers a validation retry with MetaWorld's 4-DoF hint, while observations still report the calibrated live `pose.orientation_rpy`.
+
 ### 2. Start Simulator & SAM3 Services (GPUs 4–7)
 
 Using the RPent service supervisor (see `RPent/robots/rl/README.md` and `RPent/tools/rl/sim_services.example.yaml`):
