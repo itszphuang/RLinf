@@ -59,13 +59,16 @@ python examples/agent/rpent/prepare_tasks.py \
   --robotwin-out /path/to/data/robotwin/train.jsonl
 ```
 
-In the MetaWorld Python 3.11 environment, with both repositories on `PYTHONPATH`, prepare the MT50, ML45 train and ML45 held-out pools for native index 49:
+In the MetaWorld Python 3.11 environment, with both repositories on `PYTHONPATH`, prepare the MT50, ML45 train and ML45 held-out pools for native index 49 under `${RPENT_ROOT}/data/metaworld`:
 
 ```bash
-python examples/agent/rpent/prepare_tasks.py --metaworld --seeds 49 --output-dir data/metaworld
+python examples/agent/rpent/prepare_tasks.py \
+  --metaworld \
+  --seeds 49 \
+  --output-dir "${RPENT_ROOT:-/path/to/rpent_ppo}/data/metaworld"
 ```
 
-To mix MetaWorld into GRPO training, register `env.rpent.metaworld` alongside the other pools (episode quotas must be multiples of `algorithm.group_size` and sum to `data.rollout_batch_size * group_size` / `data.sampling_batch_size * group_size`):
+To mix MetaWorld into the 8-GPU GRPO config (`train_qwen3.5_4b_rpent_grpo.yaml`, which sets `rollout_batch_size: 2`, `sampling_batch_size: 4`, `group_size: 8` → `16` rollout / `32` sampling episodes total), **replace** the default `env.rpent` block (`libero` + `robotwin`) with the `libero` + `metaworld` block below (do not merge it on top of `robotwin` without adjusting `rollout_episodes` / `sampling_episodes` so they still sum to `16` / `32`), and launch the RPent MetaWorld pool with at least `--workers 16` (matching `sampling_episodes: 16`) so startup capacity validation passes:
 
 ```yaml
 env:
